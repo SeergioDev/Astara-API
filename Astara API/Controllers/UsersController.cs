@@ -4,11 +4,13 @@ using Astara_API.DataModel;
 using Astara_API.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Astara_API.Controllers
 {
     [ApiController]
     [Route("users")]
+    [SwaggerTag("Controller Users")]
     public class UsersController : ControllerBase
     {
         private IUserService _userService;
@@ -22,7 +24,7 @@ namespace Astara_API.Controllers
 
         [HttpPost]
         [Route("authenticate")]
-        //[SwaggerOperationSummary("Add a new Pet to the store")]
+        [SwaggerOperation(Summary = "Obtención de token", Description = "Se utiliza para realizar una llamada con X parametros para la obtención de token")]
         public async Task<IActionResult> Authenticate([FromBody] Authentication modelAuthentication)
         {
 
