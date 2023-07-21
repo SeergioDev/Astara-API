@@ -5,43 +5,43 @@ using Astara_API.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Astara_API.Controllers
 {
     [ApiController]
     [Route("users")]
-    [SwaggerTag("Controller Users")]
+    [SwaggerTag("Users Controller")]
     public class UsersController : ControllerBase
     {
         private IUserService _userService;
-        private readonly JWT _jwt;
 
         public UsersController(IDbContextFactory<myTasksContext> context, IUserService userService, IOptions<JWT> jwt)
         {
             _userService = userService;
-            _jwt = jwt.Value;
         }
 
         [HttpPost]
         [Route("authenticate")]
-        [SwaggerOperation(Summary = "Obtención de token", Description = "Se utiliza para realizar una llamada con X parametros para la obtención de token")]
-        public async Task<IActionResult> Authenticate([FromBody] Authentication modelAuthentication)
+        [SwaggerOperation(Summary = "Obtención de token", Description = "Se obtiene el token para poder realizar resto de llamadas")]
+        public async Task<IActionResult> Authenticate([FromBody] UserLogin modelUserLogin)
         {
 
-            var response = _userService.getToken(modelAuthentication.User, modelAuthentication.Password);
+            var response = _userService.getToken(modelUserLogin.User, modelUserLogin.Password);
 
-            return response.Token == null ? Unauthorized() : Ok(response);
+            return response.Token == null ? Unauthorized("Credenciales incorrectas") : Ok(response);
         }
 
-        //[HttpGet]
-        //[Route("getUsers")]
-        //public async Task<IActionResult> GetUsersAsync([FromBody] Authentication modelAuthentication)
-        //{
+        [HttpGet]
+        [Route("users")]
+        [Authorize]
+        public async Task<IActionResult> GetUsersAsync()
+        {
 
-        //    var response = _userService.getToken(modelAuthentication.User, modelAuthentication.Password);
+            var response = _userService.getUsers();
 
-        //    return response.Token == null ? Unauthorized() : Ok(response);
-        //}
+            return Ok(response);
+        }
 
 
     }

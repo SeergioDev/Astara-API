@@ -16,6 +16,8 @@ public partial class myTasksContext : DbContext
     {
     }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -23,16 +25,29 @@ public partial class myTasksContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Active)
+                .IsRequired()
+                .HasDefaultValueSql("((1))");
+            entity.Property(e => e.Rol)
+                .HasMaxLength(25)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Password)
-                .HasMaxLength(50)
-                .IsFixedLength();
-            entity.Property(e => e.Usuario)
-                .HasMaxLength(50)
-                .IsFixedLength()
-                .HasColumnName("Usuario");
+            entity.Property(e => e.Apellidos).HasMaxLength(50);
+            entity.Property(e => e.Nombre).HasMaxLength(30);
+            entity.Property(e => e.Password).HasMaxLength(25);
+            entity.Property(e => e.Usuario).HasMaxLength(25);
+
+            entity.HasOne(d => d.RolNavigation).WithMany(p => p.Users)
+                .HasForeignKey(d => d.Rol)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Users_Roles");
         });
 
         OnModelCreatingPartial(modelBuilder);
