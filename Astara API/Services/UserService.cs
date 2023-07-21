@@ -27,21 +27,36 @@ namespace Astara_API.Services
         public AuthenticationResponse getToken(string user, string pass)
         {
 
-            var userResult = getUser(user, pass);
-
-            if (userResult != null)
+            try
             {
-                _authenticationResponse.Token = generateToken(userResult);
+                var userResult = getUser(user, pass);
+
+                if (userResult != null)
+                {
+                    _authenticationResponse.Token = generateToken(userResult);
+                }
+            }
+            catch
+            {
+                return _authenticationResponse;
             }
 
             return _authenticationResponse;
+
         }
 
         private User getUser(string user, string pass)
         {
-            var userResult = _context.Users.Where(u => u.Usuario == user && u.Password == pass).FirstOrDefault();
+            try
+            {
 
-            if (userResult != null) { return userResult; } else return null;
+                return _context.Users.Where(u => u.Usuario == user && u.Password == pass).FirstOrDefault();
+
+            }
+            catch
+            {
+                return null;
+            }
 
         }
 
@@ -60,17 +75,25 @@ namespace Astara_API.Services
             if (user != null)
             {
                 //Generamos token
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_jwt.Secret);
-                var tokenDescr = new SecurityTokenDescriptor
+                try
                 {
-                    Expires = DateTime.UtcNow.AddSeconds(30),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                    Subject = new ClaimsIdentity(getTokenClaims(user))
-                };
-                var token = tokenHandler.CreateToken(tokenDescr);
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(_jwt.Secret);
+                    var tokenDescr = new SecurityTokenDescriptor
+                    {
+                        Expires = DateTime.UtcNow.AddSeconds(30),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                        Subject = new ClaimsIdentity(getTokenClaims(user))
+                    };
+                    var token = tokenHandler.CreateToken(tokenDescr);
 
-                return tokenHandler.WriteToken(token);
+                    return tokenHandler.WriteToken(token);
+                }
+                catch
+                {
+                    return String.Empty;
+                }
+
             }
 
             return String.Empty;
