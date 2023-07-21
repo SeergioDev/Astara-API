@@ -7,5 +7,8 @@ namespace Astara_API.Services
     {
         AuthenticationResponse getToken(string user, string pass);
         List<User> getUsers();
+        void insertUsers(List<User> user);
+        void updateUser(int userID, User userModel);
+        void deleteUser(int userID);
     }
 }

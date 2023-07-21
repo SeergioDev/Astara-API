@@ -60,6 +60,74 @@ namespace Astara_API.Services
 
         }
 
+        private User getUser(int id)
+        {
+            try
+            {
+
+                return _context.Users.Where(u => u.Id == id).FirstOrDefault();
+
+            }
+            catch
+            {
+                return null;
+            }
+
+        }
+
+        public void insertUsers(List<User> user)
+        {
+            try
+            {
+                foreach (var users in user)
+                {
+                    _context.Add(users);
+                    _context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al insertar usuario", ex);
+            }
+
+        }
+
+        public void updateUser(int userID, User userModel)
+        {
+            try
+            {
+                var userResult = getUser(userID);
+
+                userResult.Nombre = userModel.Nombre;
+
+                _context.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al actualizar usuario", ex);
+            }
+
+        }
+
+        public void deleteUser(int userID)
+        {
+            try
+            {
+                var userResult = _context.Users.Where(u => u.Id == userID).FirstOrDefault();
+
+                _context.Remove(userResult);
+
+                _context.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al eliminar usuario", ex);
+            }
+
+        }
+
         private IEnumerable<Claim> getTokenClaims(User user)
         {
             return new List<Claim> {
@@ -103,7 +171,8 @@ namespace Astara_API.Services
         public List<User> getUsers()
         {
 
-            return _context.Users.ToList();
+            var result =  _context.Users.ToList();
+            return result;
 
         }
 

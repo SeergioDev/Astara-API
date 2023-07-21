@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Astara_API.DataAccess.mytasks.Model;
 
@@ -18,6 +17,5 @@ public partial class User
 
     public int Rol { get; set; }
 
-    [JsonIgnore]
-    public virtual Role RolNavigation { get; set; } = null!;
+    public virtual ICollection<Tarea> Tareas { get; set; } = new List<Tarea>();
 }
